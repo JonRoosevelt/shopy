@@ -9,3 +9,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(
     basedir, 'app.sqlite')
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+
+from my_app.category.views import shopy
+app.register_blueprint(shopy)
+

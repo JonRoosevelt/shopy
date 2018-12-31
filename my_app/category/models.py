@@ -1,23 +1,14 @@
-from my_app import db, ma
+from flask import jsonify
+from my_app import db
+from marshmallow_sqlalchemy import ModelSchema
 
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
-    items = db.relationship('Item', backref='category', lazy=True)
+    name = db.Column(db.String(80), unique=True, nullable=True)
 
     def __init__(self, name):
         self.name = name
-
-
-class CategorySchema(ma.Schema):
-    class Meta:
-        # Fields to expose
-        fields = ('name',)
-
-
-category_schema = CategorySchema()
-categories_schema = CategorySchema(many=True)
 
 
 class Item(db.Model):
@@ -25,20 +16,21 @@ class Item(db.Model):
     name = db.Column(db.String(80), unique=True, nullable=False)
     description = db.Column(db.String(120), unique=False)
     quantity = db.Column(db.Integer, unique=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'),
-                            nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    category = db.relationship('Category', backref='items')
 
-    def __init__(self, name, description, quantity):
+    def __init__(self, name, description, quantity, category):
         self.name = name
         self.description = description
         self.quantity = quantity
+        self.category = category
 
 
-class ItemSchema(ma.Schema):
+class CategorySchema(ModelSchema):
     class Meta:
-        # Fields to expose
-        fields = ('name', 'description', 'quantity')
+        model = Category
 
 
-item_schema = ItemSchema()
-items_schema = ItemSchema(many=True)
+class ItemSchema(ModelSchema):
+    class Meta:
+        model = Item
