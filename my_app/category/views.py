@@ -37,15 +37,16 @@ def add_category():
 @shopy.route("/category", methods=["GET"])
 def get_category():
     all_categories = Category.query.all()
-    result = category_schema.dump(all_categories, many=True)
-    return jsonify({'category': result.data})
+    result = CategorySchema().dump(all_categories, many=True)
+    return jsonify({'categories': result})
 
 
 # endpoint to get the cateogory detail by id
 @shopy.route("/category/<id>", methods=["GET"])
 def category_detail(id):
     category = Category.query.get(id)
-    return category_schema.jsonify(category)
+    result = CategorySchema().dump(category, many=False)
+    return jsonify({'category': result})
 
 
 # endpoint to update category
@@ -53,30 +54,30 @@ def category_detail(id):
 def category_update(id):
     category = Category.query.get(id)
     name = request.json['name']
-
     category.name = name
-
     db.session.commit()
-    return category_schema.jsonify(category)
+    result = CategorySchema().dump(category, many=False)
+    return jsonify({'category': result})
 
 
 # endpoint to delete category
 @shopy.route("/category/<id>", methods=["DELETE"])
 def category_delete(id):
     category = Category.query.get(id)
+    result = CategorySchema().dump(category, many=False)
     db.session.delete(category)
     db.session.commit()
 
-    return category_schema.jsonify(category)
+    return jsonify(result)
 
 
 # endpoint to create new item
 @shopy.route("/category/<category_id>/item", methods=["POST"])
-def add_item(rd):
+def add_item(category_id):
     name = request.json['name']
     description = request.json['description']
     quantity = request.json['quantity']
-    category_id = Category.query.get(id)
+    category_id = Category.query.get(category_id)
 
     new_item = Item(name, description, quantity, category_id)
 
@@ -86,35 +87,33 @@ def add_item(rd):
     return jsonify(request.json)
 
 
-# endpoint to show all items inside a category
-@shopy.route("/category/<category_id>/item", methods=["GET"])
-def get_itens():
-    all_items = Category.Item.query.all()
-    result = items_schema.dump(all_items)
+# endpoint to get the item detail by id
+@shopy.route("/item/<id>", methods=["GET"])
+def item_detail(id):
+    item = Item.query.get(id)
+    result = ItemSchema().dump(item, many=False)
     return jsonify(result)
 
 
-# endpoint to get the item detail by id
-@shopy.route("/category/<category_id>/item/<id>", methods=["GET"])
-def item_detail(id):
-    item = Category.Item.query.get(id)
-    return item_schema.jsonify(item)
-
-
 # endpoint to update item
-@shopy.route("/category<category_id>/item/<id>", methods=["PUT"])
+@shopy.route("/item/<id>", methods=["PUT"])
 def item_update(id):
-    item = Category.Item.query.get(id)
+    item = Item.query.get(id)
     name = request.json['name']
     description = request.json['description']
     quantity = request.json['quantity']
+    category_id = request.json['category_id']
 
     item.name = name
     item.description = description
     item.quantity = quantity
+    item.category_id = category_id
 
     db.session.commit()
-    return item_schema.jsonify(item)
+    return jsonify({'name': name,
+                    'description': description,
+                    'quantity': quantity,
+                    'category_id': category_id})
 
 
 # endpoint to delete item

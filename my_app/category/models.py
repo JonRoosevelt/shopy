@@ -1,6 +1,5 @@
-from flask import jsonify
 from my_app import db
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields, schema
 
 
 class Category(db.Model):
@@ -17,7 +16,9 @@ class Item(db.Model):
     description = db.Column(db.String(120), unique=False)
     quantity = db.Column(db.Integer, unique=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    category = db.relationship('Category', backref='items')
+    category = db.relationship('Category', lazy='subquery',
+                               backref='items', cascade='delete',
+                               single_parent=True)
 
     def __init__(self, name, description, quantity, category):
         self.name = name
@@ -26,11 +27,15 @@ class Item(db.Model):
         self.category = category
 
 
-class CategorySchema(ModelSchema):
-    class Meta:
-        model = Category
+class ItemSchema(schema.Schema):
+    name = fields.String()
+    description = fields.String()
+    quantity = fields.String()
+    category = fields.Int()
+    id = fields.Int()
 
 
-class ItemSchema(ModelSchema):
-    class Meta:
-        model = Item
+class CategorySchema(schema.Schema):
+    name = fields.String()
+    id = fields.Integer()
+    items = fields.Nested(ItemSchema, many=True)
