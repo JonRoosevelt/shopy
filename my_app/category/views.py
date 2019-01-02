@@ -42,7 +42,7 @@ def get_category():
 
 
 # endpoint to get the cateogory detail by id
-@shopy.route("/category/<id>", methods=["GET"])
+@shopy.route("/category/<int:id>", methods=["GET"])
 def category_detail(id):
     category = Category.query.get(id)
     result = CategorySchema().dump(category, many=False)
@@ -50,7 +50,7 @@ def category_detail(id):
 
 
 # endpoint to update category
-@shopy.route("/category/<id>", methods=["PUT"])
+@shopy.route("/category/<int:id>", methods=["PUT"])
 def category_update(id):
     category = Category.query.get(id)
     name = request.json['name']
@@ -61,7 +61,7 @@ def category_update(id):
 
 
 # endpoint to delete category
-@shopy.route("/category/<id>", methods=["DELETE"])
+@shopy.route("/category/<int:id>", methods=["DELETE"])
 def category_delete(id):
     category = Category.query.get(id)
     result = CategorySchema().dump(category, many=False)
@@ -72,7 +72,7 @@ def category_delete(id):
 
 
 # endpoint to create new item
-@shopy.route("/category/<category_id>/item", methods=["POST"])
+@shopy.route("/category/<int:category_id>/item", methods=["POST"])
 def add_item(category_id):
     name = request.json['name']
     description = request.json['description']
@@ -88,7 +88,7 @@ def add_item(category_id):
 
 
 # endpoint to get the item detail by id
-@shopy.route("/item/<id>", methods=["GET"])
+@shopy.route("/item/<int:id>", methods=["GET"])
 def item_detail(id):
     item = Item.query.get(id)
     result = ItemSchema().dump(item, many=False)
@@ -96,7 +96,7 @@ def item_detail(id):
 
 
 # endpoint to update item
-@shopy.route("/item/<id>", methods=["PUT"])
+@shopy.route("/item/<int:id>", methods=["PUT"])
 def item_update(id):
     item = Item.query.get(id)
     name = request.json['name']
@@ -117,10 +117,11 @@ def item_update(id):
 
 
 # endpoint to delete item
-@shopy.route("/category<category_id>/item/<id>", methods=["DELETE"])
+@shopy.route("/item/<int:id>", methods=["DELETE"])
 def item_delete(id):
-    item = Category.Item.query.get(id)
+    item = Item.query.get(id)
+    result = ItemSchema().dump(item)
     db.session.delete(item)
     db.session.commit()
 
-    return item_schema.jsonify(item)
+    return jsonify(result)

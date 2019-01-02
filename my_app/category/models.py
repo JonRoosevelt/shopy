@@ -5,6 +5,7 @@ from marshmallow import fields, schema
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=True)
+    item = db.relationship("Item", cascade="all, delete-orphan")
 
     def __init__(self, name):
         self.name = name
@@ -17,7 +18,7 @@ class Item(db.Model):
     quantity = db.Column(db.Integer, unique=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category', lazy='subquery',
-                               backref='items', cascade='delete',
+                               backref='items', cascade='all, delete-orphan',
                                single_parent=True)
 
     def __init__(self, name, description, quantity, category):
