@@ -77,9 +77,10 @@ def add_item(category_id):
     name = request.json['name']
     description = request.json['description']
     quantity = request.json['quantity']
+    checked = request.json['checked']
     category_id = Category.query.get(category_id)
 
-    new_item = Item(name, description, quantity, category_id)
+    new_item = Item(name, description, quantity, checked, category_id)
 
     db.session.add(new_item)
     db.session.commit()
@@ -102,17 +103,20 @@ def item_update(id):
     name = request.json['name']
     description = request.json['description']
     quantity = request.json['quantity']
+    checked = request.json['checked']
     category_id = request.json['category_id']
 
     item.name = name
     item.description = description
     item.quantity = quantity
+    item.checked = checked
     item.category_id = category_id
 
     db.session.commit()
     return jsonify({'name': name,
                     'description': description,
                     'quantity': quantity,
+                    'checked': checked,
                     'category_id': category_id})
 
 
